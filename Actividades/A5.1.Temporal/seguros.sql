@@ -21,3 +21,15 @@ insert into autos values ('A123', 'X987', 'Civic', 'Honda', 2015, 280000), ('B12
 insert into polizas (numero_poliza, costo, cobertura, auto, cliente, fecha_inicio, fecha_fin) values (100, 12000, 1, 'A123', 1, '2017-01-01', '2018-01-01'), (200, 24000, 3, 'B123', 2, '2017-07-01', '2018-07-01') 
 
 create trigger checar_cobertura no cascade before update on polizas referencing old as old_values new as new_values for each row mode db2sql when (new_values.cobertura < old_values.cobertura) begin atomic signal sqlstate '75001' ('No se puede reducir cobertura'); end
+
+-- No funciona porque se trata pasar de cobertura 3 a 1
+update polizas set cobertura = 1 where numero_poliza = 200
+-- Si funciona y la cobertura anterior se guarda en polizas_history
+update polizas set cobertura = 2 where numero_poliza = 100
+
+create trigger actualizar_costo after insert on polizas referencing new as new_values for each row mode db2sql when (new_values.sys_start = (select sys_end from polizas_history where numero_poliza = new_values.numero_poliza order by sys_end desc limit 1)) begin atomic update polizas set costo = ((days(new_values.fecha_fin) - days(new_values.fecha_inicio)) * new_values.costo / (select days(fecha_fin) - days(fecha_inicio) from polizas_history where numero_poliza = new_values.numero_poliza order by sys_end desc limit 1)) where numero_poliza = new_values.numero_poliza; end
+
+-- Cancelar la poliza a los seis meses, se actualiza el costo de la poliza a aprox. 6000
+delete from polizas for portion of business_time from '2017-07-01' to '2018-01-01' where numero_poliza = 100
+-- Cancelar la poliza a los nueve meses, se actualiza el costo de la poliza a aprox. 18000
+delete from polizas for portion of business_time from '2018-04-01' to '2018-07-01' where numero_poliza = 200
