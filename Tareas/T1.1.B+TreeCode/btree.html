@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>B+ Tree</title>
+</head>
+<body>
+  <form class="degree-form" style="float: left;">
+    <label>Degree:</label>
+    <input type="text" name="degree" id="degree">
+    <input type="submit" value="Change degree">
+  </form>
+  <form class="insert-form">
+    <label>&emsp;Value:</label>
+    <input type="text" name="insert" id="insert">
+    <input type="submit" value="Insert">
+  </form>
+  <div class="treeDiv">
+  </div>
+
+  <script>
+  function LeafNode(initialKeys = []) {
+    this.keys = initialKeys;
+    this.nextPage = null;
+    this.parent = null;
+  }
+  
+  // Los nodos internos tienen apuntadores a los hijos
+  function InnerNode(initialKeys = [], initialPointers = []) {
+    this.keys = initialKeys;
+    this.pointers = initialPointers;
+    this.parent = null;
+    this.pointers.forEach(pointer => {pointer.parent = this});
+  }
+  
+  // Encontrar el nodo para insertar el nuevo elemento
+  function search(node, key) {
+    if (!node.pointers)
+      return node;
+    for (var i = 0; i < node.keys.length; ++i) {
+      if (key < node.keys[i])
+        return search(node.pointers[i], key);
+    }
+    return search(node.pointers[i], key);
+  }
+  
+  function getPointerIndex(parent, node) {
+    for (let i = 0; i < parent.pointers.length; ++i)
+      if (parent.pointers[i] == node)
+        return i;
+  }
+  
+  function insert(root, key) {
+    node = search(root, key);
+    insertIntoNode(node, key);
+  }
+    
+  function insertIntoNode(node, key) {
+    node.keys.push(key);
+    node.keys.sort((a, b) => {return a-b});
+    // Si hay mas de los debidos
+    if (node.keys.length > degree - 1) {
+      let newKey = node.keys[parseInt(node.keys.length/2)];
+      
+      if (!node.pointers) {
+        var newNode = new LeafNode(node.keys.slice(node.keys.length/2, node.keys.length));
+        newNode.nextPage = node.nextPage;
+        node.nextPage = newNode;
+      }
+      else {
+        var newNode = new InnerNode(
+                        node.keys.slice(node.keys.length/2 + 1, node.keys.length), 
+                        node.pointers.slice(Math.ceil(node.pointers.length/2), node.pointers.length));
+        node.pointers = node.pointers.slice(0, Math.ceil(node.pointers.length/2));
+      }
+      node.keys = node.keys.slice(0, node.keys.length/2);
+      
+      // Crear una nueva raiz para insertar el elemento
+      if (!node.parent) {
+        root = node.parent = newNode.parent = new InnerNode();
+        node.parent.pointers.push(node, newNode);
+      }
+      else {
+        newNode.parent = node.parent;
+        let index = getPointerIndex(node.parent, node);
+        node.parent.pointers.splice(index + 1, 0, newNode);
+      }
+      insertIntoNode(node.parent, newKey); // Insertar el elemento que sobra en el padre
+    }
+  }
+  
+  function printTree(root, level = 0) {
+    p.innerHTML = "&emsp;".repeat(level) + root.keys.toString();
+    p = document.createElement('p');
+    treeDiv.appendChild(p);
+    
+    if (!root.pointers)
+      return;
+    for (let i = 0; i < root.pointers.length; ++i)
+      printTree(root.pointers[i], level + 1);
+  }
+  
+  let root = new LeafNode();
+  let degree = 3;
+  document.getElementById('degree').value = degree;
+  
+  const treeDiv = document.querySelector('.treeDiv');
+  let p = document.createElement('p');
+  treeDiv.appendChild(p);
+  
+  const degreeForm = document.querySelector('.degree-form');
+  degreeForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    degree = parseInt((document.querySelector('[name=degree]')).value);
+    root = new LeafNode(); // Crear un nuevo arbol
+    clearScreen();
+  });
+  
+  const insertForm = document.querySelector('.insert-form');
+  insertForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clearScreen();
+    insert(root, parseInt((document.querySelector('[name=insert]')).value));
+    printTree(root);
+    document.getElementById('insert').value = '';
+  });
+  
+  function clearScreen() {
+    while (treeDiv.firstChild)
+      treeDiv.removeChild(treeDiv.firstChild);
+    p = document.createElement('p');
+    treeDiv.appendChild(p);
+  }
+  
+  </script>
+</body>
+</html>
