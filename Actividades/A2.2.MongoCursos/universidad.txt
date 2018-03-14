@@ -1,0 +1,76 @@
+use universidad
+db.createCollection("cursos")
+db.cursos.insert({titulo: "Bases de datos"})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {anio: 2018}})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {evaluaciones_escritas: {preguntas_teoricas: 20, preguntas_practicas: 10}}})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {profesor: {nombre: "Juan Perez", nomina: "L123", genero: "Masculino" }}})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {"profesor.direccion": {calle: "Reforma", numero: 910, cp: 11000, ciudad: "CDMX" }}})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {alumnos: []}})
+db.cursos.update({titulo: "Bases de datos"}, {$push: {alumnos: {nombre: "Alberto Pickering", matricula: "A123", genero: "Masculino"}}})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {"alumnos.0.direccion": {calle: "Palmas", numero: 220, cp: 11500, ciudad: "CDMX" }}})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {evaluaciones_curso: [], evaluaciones_profesor: [], comentarios_alumnos: []}})
+db.cursos.update({titulo: "Bases de datos"}, {$push: {evaluaciones_curso: { "Alberto Pickering": 9 }}})
+db.cursos.update({titulo: "Bases de datos"}, {$push: {evaluaciones_curso: {matricula: "A123", calificacion: 9 }}})
+db.cursos.update({titulo: "Bases de datos"}, {$push: {evaluaciones_profesor: {matricula: "A123", calificacion: 10 }}})
+db.cursos.update({titulo: "Bases de datos"}, {$push: {comentarios_alumnos: {matricula: "A123", mitad: "He aprendido mucho", final: "Fue un gran curso" }}})
+
+
+{
+        "_id" : ObjectId("5aa98ba8af37f1e7ba1a21f2"),
+        "titulo" : "Bases de datos",
+        "anio" : 2018,
+        "evaluaciones_escritas" : {
+                "preguntas_teoricas" : 20,
+                "preguntas_practicas" : 10
+        },
+        "profesor" : {
+                "nombre" : "Juan Perez",
+                "nomina" : "L123",
+                "genero" : "Masculino",
+                "direccion" : {
+                        "calle" : "Reforma",
+                        "numero" : 910,
+                        "cp" : 11000,
+                        "ciudad" : "CDMX"
+                }
+        },
+        "alumnos" : [
+                {
+                        "nombre" : "Alberto Pickering",
+                        "matricula" : "A123",
+                        "genero" : "Masculino",
+                        "direccion" : {
+                                "calle" : "Palmas",
+                                "numero" : 220,
+                                "cp" : 11500,
+                                "ciudad" : "CDMX"
+                        },
+                        "calificaciones" : {
+                                "e1" : 100,
+                                "e2" : 95,
+                                "e3" : 90,
+                                "e4" : 95,
+                                "final" : 95
+                        }
+                }
+        ],
+        "comentarios_alumnos" : [
+                {
+                        "matricula" : "A123",
+                        "mitad" : "He aprendido mucho",
+                        "final" : "Fue un gran curso"
+                }
+        ],
+        "evaluaciones_curso" : [
+                {
+                        "matricula" : "A123",
+                        "calificacion" : 9
+                }
+        ],
+        "evaluaciones_profesor" : [
+                {
+                        "matricula" : "A123",
+                        "calificacion" : 10
+                }
+        ]
+}
