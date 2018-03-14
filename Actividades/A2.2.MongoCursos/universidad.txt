@@ -8,11 +8,9 @@ db.cursos.update({titulo: "Bases de datos"}, {$set: {"profesor.direccion": {call
 db.cursos.update({titulo: "Bases de datos"}, {$set: {alumnos: []}})
 db.cursos.update({titulo: "Bases de datos"}, {$push: {alumnos: {nombre: "Alberto Pickering", matricula: "A123", genero: "Masculino"}}})
 db.cursos.update({titulo: "Bases de datos"}, {$set: {"alumnos.0.direccion": {calle: "Palmas", numero: 220, cp: 11500, ciudad: "CDMX" }}})
-db.cursos.update({titulo: "Bases de datos"}, {$set: {evaluaciones_curso: [], evaluaciones_profesor: [], comentarios_alumnos: []}})
-db.cursos.update({titulo: "Bases de datos"}, {$push: {evaluaciones_curso: { "Alberto Pickering": 9 }}})
-db.cursos.update({titulo: "Bases de datos"}, {$push: {evaluaciones_curso: {matricula: "A123", calificacion: 9 }}})
-db.cursos.update({titulo: "Bases de datos"}, {$push: {evaluaciones_profesor: {matricula: "A123", calificacion: 10 }}})
-db.cursos.update({titulo: "Bases de datos"}, {$push: {comentarios_alumnos: {matricula: "A123", mitad: "He aprendido mucho", final: "Fue un gran curso" }}})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {"alumnos.0.evaluacion_curso": 9 }})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {"alumnos.0.evaluacion_profesor": 10 }})
+db.cursos.update({titulo: "Bases de datos"}, {$set: {"alumnos.0.comentarios": {mitad: "He aprendido mucho", final: "Fue un gran curso" } }})
 
 
 {
@@ -51,26 +49,13 @@ db.cursos.update({titulo: "Bases de datos"}, {$push: {comentarios_alumnos: {matr
                                 "e3" : 90,
                                 "e4" : 95,
                                 "final" : 95
+                        },
+                        "evaluacion_curso" : 9,
+                        "evaluacion_profesor" : 10,
+                        "comentarios" : {
+                                "mitad" : "He aprendido mucho",
+                                "final" : "Fue un gran curso"
                         }
-                }
-        ],
-        "comentarios_alumnos" : [
-                {
-                        "matricula" : "A123",
-                        "mitad" : "He aprendido mucho",
-                        "final" : "Fue un gran curso"
-                }
-        ],
-        "evaluaciones_curso" : [
-                {
-                        "matricula" : "A123",
-                        "calificacion" : 9
-                }
-        ],
-        "evaluaciones_profesor" : [
-                {
-                        "matricula" : "A123",
-                        "calificacion" : 10
                 }
         ]
 }
