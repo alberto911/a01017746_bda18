@@ -1,0 +1,71 @@
+// Restaurantes por zipcode
+db.restaurants.mapReduce(
+    function() { emit(this.address.zipcode, 1); }, 
+    function(key, values) { return Array.sum(values) }, 
+    { out: "restaurants_per_zipcode" } 
+)
+
+// Grades por usuario
+db.restaurants.mapReduce(
+    function() { 
+        for (var i = 0; i < this.grades.length; ++i)
+            emit(this.restaurant_id, 1)
+    }, 
+    function(key, values) { return Array.sum(values) }, 
+    { out: "grades_per_user" } 
+)
+
+// Total de scores por usuario
+db.restaurants.mapReduce(
+    function() { 
+        for (var i = 0; i < this.grades.length; ++i)
+            emit(this.restaurant_id, this.grades[i].score)
+    }, 
+    function(key, values) { return Array.sum(values) }, 
+    { out: "total_scores_per_user" } 
+)
+
+// Restaurantes con grade A, grade B y grade C
+db.restaurants.mapReduce(
+    function() {
+        var alreadyEmitted = [false, false, false];
+        for (var i = 0; i < this.grades.length; ++i) {
+            if (this.grades[i].grade == 'A' && !alreadyEmitted[0]) {
+                emit('A', 1);
+                alreadyEmitted[0] = true;
+            }
+            if (this.grades[i].grade == 'B' && !alreadyEmitted[1]) {
+                emit('B', 1);
+                alreadyEmitted[1] = true;
+            }
+            if (this.grades[i].grade == 'C' && !alreadyEmitted[2]) {
+                emit('C', 1);
+                alreadyEmitted[2] = true;
+            }
+        }
+    }, 
+    function(key, values) { return Array.sum(values) }, 
+    { out: "restaurants_per_grade" } 
+)
+
+// Total de restaurantes por cuisine
+db.restaurants.mapReduce(
+    function() { emit(this.cuisine, 1); }, 
+    function(key, values) { return Array.sum(values) }, 
+    { out: "restaurants_per_cuisine" } 
+)
+
+// 10 restaurantes más cercanos a 40360045
+db.restaurants.mapReduce(
+    function() { 
+        var distance = Math.sqrt(Math.pow(this.address.coord[0] - coords[0], 2) + Math.pow(this.address.coord[1] - coords[1], 2))
+        emit(this.restaurant_id, distance)
+    }, 
+    function(key, values) { }, 
+    {
+        scope: { coords: db.restaurants.find({restaurant_id: "40360045"}, {_id: 0, address: 1}).toArray()[0].address.coord },
+        query: { restaurant_id: { $ne: "40360045"}, address.coords.length },
+        out: "distance_to_restaurant"
+    } 
+)
+db.distance_to_restaurant.find({value: {$ne: NaN} }).sort({value: 1}).limit(10)
