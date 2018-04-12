@@ -1,0 +1,29 @@
+1. match (people:Person)-[:ACTED_IN]->(:Movie) return count(distinct people)
+   102
+
+2. match (people:Person)-[:PRODUCED]->(m:Movie) return count(distinct people)
+   8
+
+3. match (people:Person)-[:DIRECTED]->(m:Movie) return count(distinct people)
+   28
+
+4. match (movies:Movie) return count(*)
+   38
+
+5. match (people:Person)-[w:WROTE]->(:Movie) return people.name, count(w) as total order by total desc
+   Andy y Lana Wachowski
+
+6. match (people:Person)-[reviews:REVIEWED]->(movies:Movie) return movies.title, avg(reviews.rating) as rating order by rating desc limit 5
+   Cloud Atlas
+   Jerry Maguire
+   Unforgiven
+   The Replacements
+   The Da Vinci Code
+
+7. match p=shortestPath(
+         (al:Person {name:"Al Pacino"})-[*]-(audrey:Person {name:"Audrey Tautou"})
+   ) return p
+   Keanu Reeves y James Thompson
+
+8. match (p:Person)-[:PRODUCED]->(m:Movie), (p)-[:ACTED_IN]->(m) return p.name
+   Nadie
