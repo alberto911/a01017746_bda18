@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    build: ./almacen
+    build: ./app
     image: webapp
     ports:
      - "8080:8080"

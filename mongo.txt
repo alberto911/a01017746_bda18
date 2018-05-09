@@ -1,0 +1,12 @@
+db.usuarios.insert({nombre: "Alberto", telefono: 55443322, edad: 23})
+db.usuarios.find({edad: { $ne: 27 }}, {_id: 0, nombre: 1})
+db.usuarios.update({nombre: "Ariel"}, {$set: {edad:32}})
+ 
+db.usuarios.aggregate([
+                        {$group: {_id: "$edad", count: {$sum: 1}}}
+                      ])
+                      
+db.usuarios.aggregate([
+                        {$match: {nombre: "Alberto"}},
+                        {$group: {_id: "$edad", count: {$sum: 1}}}
+                      ])
