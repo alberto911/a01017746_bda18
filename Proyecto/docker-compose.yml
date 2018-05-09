@@ -1,0 +1,16 @@
+version: '3'
+services:
+  web:
+    build: ./almacen
+    image: webapp
+    ports:
+     - "8080:8080"
+    network_mode: "host"
+  db:
+    image: neo4j:3.0
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    network_mode: "host"
+    volumes:
+      - ./neo4j/data:/data
